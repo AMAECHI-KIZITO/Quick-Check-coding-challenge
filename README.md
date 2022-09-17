@@ -1,0 +1,2 @@
+# Quick-Check-coding-challenge
+This was a coding challenge to consume news sources from hacker news API endpoints, develop and design a database to store and organize news sources based on their categories, write to the database and auto update the database with new news as posted on the API. It also instructs to create our own API endpoints that allows people to add to our database, fetch from our database, as well as delete posts only manually added to the database and not those gotten from Hacker news API endpoints.
