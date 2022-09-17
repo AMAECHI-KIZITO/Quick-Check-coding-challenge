@@ -1,0 +1,38 @@
+{% extends 'hackerhome.html' %}
+
+{%block title%}Hacker News - Job Stories{%endblock%}
+
+{%block lateststories%}
+<div class='row mb-3' style='background-color:orange; border-bottom-style: solid'>
+    <div class='col'>
+        <h3 style='color:darkblue;'>Job Stories</h3>
+    </div>
+</div>
+
+<div class='row'>
+    {%for job_stories in job_news.items%}
+        <div class='col-12 pb-2 mt-1'  style='border-bottom-style: dotted'>
+            <h6>{{job_stories.title}}</h6>
+            <p style="font-size:13px"><b>Posted By</b>: {{job_stories.posted_by.capitalize()}}</p>
+            <p style="font-size:13px"><b>Date Posted</b>: {{job_stories.unix_time_convert}}</p>
+            
+            <a class='btn btn-outline-success btn-sm float-end' href='{{job_stories.job_url}}'>View Job</a>
+        </div>
+    {%endfor%}
+</div>
+
+<div class="mt-3">
+    {%for pagenum in job_news.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
+        {%if pagenum%}
+            {%if job_news.page == pagenum %}
+            <a href='{{url_for("jobstories", page=pagenum)}}' class='btn btn-success mb-4'>{{pagenum}}</a>
+            {%else%}
+            <a href='{{url_for("jobstories", page=pagenum)}}' class='btn btn-outline-success mb-4'>{{pagenum}}</a>
+            {%endif%}
+        {%else%}
+            ...
+        {%endif%}
+    {%endfor%}
+</div><hr>
+   
+{%endblock lateststories%}

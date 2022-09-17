@@ -1,0 +1,46 @@
+{% extends 'hackerhome.html' %}
+
+
+{%block title%}Hacker News - Top Stories{%endblock%}
+
+
+{%block lateststories%}
+<div class='row mb-3' style='background-color:orange; border-bottom-style: solid'>
+    <div class='col'>
+        <h3 style='color:darkblue;'>Top Stories</h3>
+    </div>
+</div>
+
+<div class='row'>
+    {%for top_stories in top_news.items%}
+        <div class='col-12 pb-2 mt-1'  style='border-bottom-style: dotted'>
+            <h6>{{top_stories.title}}</h6>
+            <p style="font-size:13px"><b>Posted By</b>: {{top_stories.posted_by.capitalize()}}</p>
+            <p style="font-size:13px"><b>Date Posted</b>: {{top_stories.unix_time_convert}}</p>
+            
+            {%if top_stories.decendants > 1%}
+            <a class='btn btn-info btn-sm' href='/top-story-comments/{{top_stories.top_story_id}}'>{{top_stories.decendants}} Comments</a>
+            {%else%}
+            <a class='btn btn-info btn-sm' href='/top-story-comments/{{top_stories.top_story_id}}'>{{top_stories.decendants}} Comment</a>
+            {%endif%}
+
+            <a class='btn btn-primary btn-sm float-end' href='{{top_stories.story_url}}'>Read More</a>
+        </div>
+    {%endfor%}
+</div>
+
+<div class="mt-3">
+    {%for pagenum in top_news.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
+        {%if pagenum%}
+            {%if top_news.page == pagenum %}
+            <a href='{{url_for("topstories", page=pagenum)}}' class='btn btn-success mb-4'>{{pagenum}}</a>
+            {%else%}
+            <a href='{{url_for("topstories", page=pagenum)}}' class='btn btn-outline-success mb-4'>{{pagenum}}</a>
+            {%endif%}
+        {%else%}
+            ...
+        {%endif%}
+    {%endfor%}
+</div><hr>
+   
+{%endblock lateststories%}

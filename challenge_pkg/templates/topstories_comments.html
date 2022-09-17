@@ -1,0 +1,27 @@
+{% extends 'hackerhome.html' %}
+
+{%block title%}Hacker News - Top Stories Comments{%endblock%}
+
+{%block lateststories%}
+<div class='row mb-3'>
+    <div class='col'>
+        <h3 class='text-danger'>Comments</h3>
+    </div>
+</div>
+
+<div class='row'>
+    {%for x in The_comments%}
+    <div class='col-12' style='border:1px solid grey'>
+        <p style="font-size:13px"><b>Posted By</b>: {{x.get('by').capitalize()}}</p>
+        <p style="font-size:13px"><b>Replying To</b>: {{comments.get('by').capitalize()}}</p>
+        {%autoescape false%}
+
+        <div style="font-size:13px">
+            <p><b>Comment</b>: {{x.get('text','This comment is no longer available')}}</p>
+        </div>
+        {%endautoescape%}
+    </div>
+    {%endfor%}
+</div>
+   
+{%endblock lateststories%}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <title>{%block title%}Hacker News - Home{%endblock%}</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="keywords" content="">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap.css')}}">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='font/css/all.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='JQanimate.css')}}">
+
+		<style type="text/css">
+            
+            
+            {%block style%}{%endblock style%}
+            
+            @media screen and (max-width:768px){
+                
+            }
+
+            @media screen and (max-width:425px){
+                
+            }
+
+            @media screen and (max-width:375px){
+                
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid" >
+            {%block navigation%}
+            <div class="row" style="position:sticky; top:0px; z-index:5 mb-3">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                    <div class="container-fluid  mx-lg-5">
+                        <a class="navbar-brand brandname" href="/" style="font-family:'lucida-calligraphy'"><h3 id='BRAND'>Hacker News</h3></a>
+                        <button class=" btn btn-sm navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                                <li class="nav-item">
+                                    <a class="nav-link active links" href="/home/" style="font-size:14px">Latest News</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link active links" href="/top-stories/" style="font-size:14px">Top Stories</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link active links" href="/job-stories/" style="font-size:14px">Job Stories</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            {%endblock navigation%}
+            
+            {%block lateststories%}
+            <div class='row mb-3' style='background-color:orange; border-bottom-style: solid'>
+                <div class='col'>
+                    <h2 style='color:darkblue;'>New Stories</h2>
+                </div>
+            </div>
+            <div class='row'>
+                {%for new_stories in new_news.items%}
+                    <div class='col-12 pb-2 mt-1'  style='border-bottom-style: dotted'>
+                        <h6>{{new_stories.title}}</h6>
+                        <p style="font-size:13px"><b>Posted By</b>: {{new_stories.posted_by.capitalize()}}</p>
+                        <p style="font-size:13px"><b>Date Posted</b>: {{new_stories.unix_time_convert}}</p>
+                        {%if new_stories.decendants > 1%}
+                        <a class='btn btn-info btn-sm' href='/comments/{{new_stories.new_story_id}}'>{{new_stories.decendants}} Comments</a>
+                        {%else%}
+                        <a class='btn btn-info btn-sm' href='/comments/{{new_stories.new_story_id}}'>{{new_stories.decendants}} Comment</a>
+                        {%endif%}
+                        <a class='btn btn-outline-success btn-sm float-end' href='{{new_stories.story_url}}'>Read More</a>
+                    </div>
+                {%endfor%}
+                
+            </div>
+
+            <div class="mt-3">
+                {%for pagenum in new_news.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
+                    {%if pagenum%}
+                        {%if new_news.page == pagenum %}
+                        <a href='{{url_for("home", page=pagenum)}}' class='btn btn-success mb-4'>{{pagenum}}</a>
+                        {%else%}
+                        <a href='{{url_for("home", page=pagenum)}}' class='btn btn-outline-success mb-4'>{{pagenum}}</a>
+                        {%endif%}
+                    {%else%}
+                        ...
+                    {%endif%}
+                {%endfor%}
+            </div><hr>
+            
+            {%endblock lateststories%}
+        </div>
+
+        {%autoescape false%}
+        <script type="text/javascript" src="{{url_for('static',filename='jquery/jquery.min.js')}}"></script>
+        {%block scripts%}
+        <script type='text/javascript'>
+           
+        </script>
+        {%endblock scripts%}
+        <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.bundle.js')}}"></script>
+        {%endautoescape%}
+    </body>
+</html>
