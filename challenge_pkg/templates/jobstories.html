@@ -2,9 +2,22 @@
 
 {%block title%}Hacker News - Job Stories{%endblock%}
 
+{%block searches%}
+<div>
+    <form action='/search_job_news/' method='post'>
+        <div>
+            <input type='text' name='search_job_news' id='search_job_news' placeholder='Search Job News'/>
+            <input type='hidden' name='csrf_token' id='csrf_token' value='{{csrf_token()}}'>
+            <button type='submit' class='btn btn-warning btn-sm' id='btnSearchJobNews' onclick='return checkJobNews()'>Search</button>
+        </div>
+    </form>
+</div>
+{%endblock searches%}
+
+
 {%block lateststories%}
 <div class='row mb-3' style='background-color:orange; border-bottom-style: solid'>
-    <div class='col'>
+    <div class='col py-3'>
         <h3 style='color:darkblue;'>Job Stories</h3>
     </div>
 </div>
@@ -12,11 +25,11 @@
 <div class='row'>
     {%for job_stories in job_news.items%}
         <div class='col-12 pb-2 mt-1'  style='border-bottom-style: dotted'>
-            <h6>{{job_stories.title}}</h6>
-            <p style="font-size:13px"><b>Posted By</b>: {{job_stories.posted_by.capitalize()}}</p>
-            <p style="font-size:13px"><b>Date Posted</b>: {{job_stories.unix_time_convert}}</p>
+            <h5>{{job_stories.title}}</h5>
+            <p style="font-size:13px; color:#fff"><b>Posted By</b>: {{job_stories.posted_by.capitalize()}}</p>
+            <p style="font-size:13px; color:#fff"><b>Date Posted</b>: {{job_stories.unix_time_convert}}</p>
             
-            <a class='btn btn-outline-success btn-sm float-end' href='{{job_stories.job_url}}'>View Job</a>
+            <a class='btn btn-warning btn-sm float-end' href='{{job_stories.job_url}}'>View Job</a>
         </div>
     {%endfor%}
 </div>
@@ -25,9 +38,9 @@
     {%for pagenum in job_news.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
         {%if pagenum%}
             {%if job_news.page == pagenum %}
-            <a href='{{url_for("jobstories", page=pagenum)}}' class='btn btn-success mb-4'>{{pagenum}}</a>
+            <a href='{{url_for("jobstories", page=pagenum)}}' class='btn btn-warning mb-4'>{{pagenum}}</a>
             {%else%}
-            <a href='{{url_for("jobstories", page=pagenum)}}' class='btn btn-outline-success mb-4'>{{pagenum}}</a>
+            <a href='{{url_for("jobstories", page=pagenum)}}' class='btn btn-outline-warning mb-4'>{{pagenum}}</a>
             {%endif%}
         {%else%}
             ...
@@ -36,3 +49,17 @@
 </div><hr>
    
 {%endblock lateststories%}
+
+
+{%block scripts%}
+    <script type='text/javascript'>
+        function checkJobNews(){
+
+            if(document.getElementById('search_job_news').value==""){
+                alert('Field cannot be empty')
+                $('#search_job_news').focus();
+                return false;
+            }
+        }    
+    </script>
+{%endblock scripts%}

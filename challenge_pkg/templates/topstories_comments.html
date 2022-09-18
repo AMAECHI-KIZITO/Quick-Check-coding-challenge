@@ -12,8 +12,8 @@
 <div class='row'>
     {%for x in The_comments%}
     <div class='col-12' style='border:1px solid grey'>
-        <p style="font-size:13px"><b>Posted By</b>: {{x.get('by').capitalize()}}</p>
-        <p style="font-size:13px"><b>Replying To</b>: {{comments.get('by').capitalize()}}</p>
+        <p style="font-size:14px;color:#fff"><b>Posted By</b>: {{x.get('by').capitalize()}}</p>
+        <p style="font-size:14px;color:#fff"><b>Replying To</b>: {{comments.get('by').capitalize()}}</p>
         {%autoescape false%}
 
         <div style="font-size:13px">

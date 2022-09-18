@@ -1,6 +1,6 @@
 import json,os,requests,random
-import schedule,time
-from flask import jsonify,request,make_response,render_template
+import schedule,time,threading
+from flask import jsonify,request,make_response,render_template,flash
 from datetime import datetime,date,timedelta
 from flask_sqlalchemy import SQLAlchemy
 from challenge_pkg import app,db
@@ -178,12 +178,88 @@ def find_topstory_comment(story_id):
 
 
 
+## Search for a top news post
+@app.route('/search_top_news/', methods=['POST'])
+def find_topnews_post():
+    to_be_found=request.form.get('search_top_news')
+    result=db.session.query(Top_stories).filter(Top_stories.title.ilike(f"%{to_be_found}%")).distinct()
+    
+    if result!=[]:
+        return render_template('searchresult.html', result=result)
+    else:
+        flash('No result match your search', category='item_not_found')
+        
+        return render_template('searchresult.html') 
+    
+
+## Search for a new news post
+@app.route('/search_new_news/', methods=['POST'])
+def find_Newnews_post():
+    to_be_found=request.form.get('search_latest_news')
+    result=db.session.query(New_stories).filter(New_stories.title.ilike(f"%{to_be_found}%")).all()
+    
+    if result!=[]:
+        return render_template('searchresult.html', result=result)
+    else:
+        flash('No result match your search', category='item_not_found')
+        
+        return render_template('searchresult.html') 
+
+
+
+## Search for a Job news post
+@app.route('/search_job_news/', methods=['POST'])
+def find_jobnews_post():
+    to_be_found=request.form.get('search_job_news')
+    result=db.session.query(Job_stories).filter(Job_stories.title.ilike(f"%{to_be_found}%")).all()
+    
+    if result!=[]:
+        return render_template('jobsearchresult.html', result=result)
+    else:
+        #flash('No result match your search', category='item_not_found')
+        flash('No result match your search', category='item_not_found')
+        return render_template('jobsearchresult.html') 
+    
+
+
+# UNCOMMENT THIS CODE BEFORE YOU RUN THE SERVER TO AUTO WRITE THE TOP 100 STORIES OF EACH CATEGORY OF NEWS TO THE DB. Also, you'd need to first comment the codes below this, from def run continuously before running this. after the top 100 has been added, you can then comment out this part and un-comment out the codes below this for the updates to run automatically.           
+# write_newstories_to_db()    
+# write_jobstories_to_db()
+# write_topstories_to_db()
+
+
+
+def run_continuously(interval=1):
+    """Continuously run, while executing pending jobs at each
+    elapsed time interval.
+    @return cease_continuous_run: threading. Event which can
+    be set to cease continuous run. Please note that it is
+    *intended behavior that run_continuously() does not run
+    missed jobs*. For example, if you've registered a job that
+    should run every minute and you set a continuous run
+    interval of one hour then your job won't be run 60 times
+    at each interval but only once.
+    """
+    cease_continuous_run = threading.Event()
+
+    class ScheduleThread(threading.Thread):
+        @classmethod
+        def run(cls):
+            while not cease_continuous_run.is_set():
+                schedule.run_pending()
+                time.sleep(interval)
+
+    continuous_thread = ScheduleThread()
+    continuous_thread.start()
+    return cease_continuous_run
+
+
 #### This Function is used to automatically update the new news database
 def update_new_stories():
     #connects to newstories API end point
     rsp=requests.get("https://hacker-news.firebaseio.com/v0/newstories.json")
     rsp_json=rsp.json() #converts rsp from HTTP response to json
-    new_stories_id_list=rsp_json[0:20]
+    new_stories_id_list=rsp_json[0:15]
     
     Update=[]
     #news db list
@@ -192,7 +268,7 @@ def update_new_stories():
         news_db_list=[]
         for x in news_db:
            news_db_list.append(x.new_story_id)
-           existing_news_top15= news_db_list[0:15]
+           existing_news_top15= news_db_list[0:8]
            
         for compare in new_stories_id_list:
             if compare in existing_news_top15:
@@ -222,17 +298,17 @@ def update_new_stories():
             db.session.add(new_stories)
             db.session.commit()
     
-    print(Update)
+    
    
 
 
 
-#### This Function is used to automatically update the Top News Database
+### This Function is used to automatically update the Top News Database
 def update_Topnews_DB_stories():
     #connects to topstories API end point
     rsp=requests.get("https://hacker-news.firebaseio.com/v0/topstories.json")
     rsp_json=rsp.json() #converts rsp from HTTP response to json
-    new_stories_id_list=rsp_json[0:20]
+    new_stories_id_list=rsp_json[0:15]
     
     Update=[]
     #top news db list
@@ -241,7 +317,7 @@ def update_Topnews_DB_stories():
         news_db_list=[]
         for x in news_db:
            news_db_list.append(x.top_story_id)
-           existing_news_top15= news_db_list[0:15]
+           existing_news_top15= news_db_list[0:8]
            
         for compare in new_stories_id_list:
             if compare in existing_news_top15:
@@ -271,22 +347,63 @@ def update_Topnews_DB_stories():
             db.session.add(new_stories)
             db.session.commit()
     
-    print(Update)  
-
-
-# UNCOMMENT THIS CODE BEFORE YOU RUN THE SERVER TO AUTO WRITE THE TOP 100 STORIES OF EACH CATEGORY OF NEWS TO THE DB            
-write_newstories_to_db()    
-write_jobstories_to_db()
-write_topstories_to_db()
-
-
-
-
-schedule.every(5).minutes.do(update_Topnews_DB_stories)   
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+     
     
+    
+    
+    
+### This Function is used to automatically update the Top News Database
+def update_Jobnews_DB_stories():
+    #connects to topstories API end point
+    rsp=requests.get("https://hacker-news.firebaseio.com/v0/jobstories.json")
+    rsp_json=rsp.json() #converts rsp from HTTP response to json
+    new_stories_id_list=rsp_json[0:10]
+    
+    Update=[]
+    #top news db list
+    news_db=db.session.query(Job_stories).all()
+    if news_db!=[]:
+        news_db_list=[]
+        for x in news_db:
+           news_db_list.append(x.job_story_id)
+           existing_news_top15= news_db_list[0:6]
+           
+        for compare in new_stories_id_list:
+            if compare in existing_news_top15:
+                continue
+            else:
+                Update.append(compare)
+                for update in Update:
+                    child = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{update}.json")
+                    child_deets=child.json()
+                    
+                    #this is to write to the db
+                    new_date=datetime.utcfromtimestamp(child_deets['time']) + timedelta(hours=1)
+                                                
+                    new_stories=Job_stories(job_story_id=child_deets['id'], posted_by=child_deets['by'], unix_time=child_deets['time'],unix_time_convert=new_date, title=child_deets['title'],story_type=child_deets['type'], job_url=child_deets.get('url','#'))
+                    db.session.add(new_stories)
+                    db.session.commit()
+                Update=[]
+    else:
+        for added in new_stories_id_list:
+            child = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{added}.json")
+            child_deets=child.json()
+                    
+            #this is to write to the db
+            new_date=datetime.utcfromtimestamp(child_deets['time']) + timedelta(hours=1)
+                                                
+            new_stories=Job_stories(job_story_id=child_deets['id'], posted_by=child_deets['by'], unix_time=child_deets['time'],unix_time_convert=new_date, title=child_deets['title'],story_type=child_deets['type'], job_url=child_deets.get('url','#'))
+            db.session.add(new_stories)
+            db.session.commit()
 
-   
+
+schedule.every(5).minutes.do(update_new_stories)
+schedule.every(7).minutes.do(update_Topnews_DB_stories)   
+schedule.every(10).minutes.do(update_Jobnews_DB_stories)   
+
+# To Start the background thread
+stop_run_continuously = run_continuously()
+time.sleep(10)
+
+# To Stop the background thread
+#stop_run_continuously.set()

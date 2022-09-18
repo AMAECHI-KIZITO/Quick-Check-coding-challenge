@@ -10,7 +10,10 @@
         <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='JQanimate.css')}}">
 
 		<style type="text/css">
-            
+            body{
+                background-color:#000;
+                color:yellow;
+            }
             
             {%block style%}{%endblock style%}
             
@@ -52,7 +55,19 @@
                                     <a class="nav-link active links" href="/job-stories/" style="font-size:14px">Job Stories</a>
                                 </li>
                             </ul>
+                            {%block searches%}
+                            <div>
+                                <form action='/search_new_news/' method='post'>
+                                    <div>
+                                        <input type='text' name='search_latest_news' id='search_latest_news' placeholder='Search Latest News'/>
+                                        <input type='hidden' name='csrf_token' id='csrf_token' value='{{csrf_token()}}'>
+                                        <button type='submit' class='btn btn-warning btn-sm' id='btnSearchNewnews' onclick='return checkNewNews()'>Search</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {%endblock searches%}
                         </div>
+                        
                     </div>
                 </nav>
             </div>
@@ -60,22 +75,22 @@
             
             {%block lateststories%}
             <div class='row mb-3' style='background-color:orange; border-bottom-style: solid'>
-                <div class='col'>
+                <div class='col py-3'>
                     <h2 style='color:darkblue;'>New Stories</h2>
                 </div>
             </div>
             <div class='row'>
                 {%for new_stories in new_news.items%}
                     <div class='col-12 pb-2 mt-1'  style='border-bottom-style: dotted'>
-                        <h6>{{new_stories.title}}</h6>
-                        <p style="font-size:13px"><b>Posted By</b>: {{new_stories.posted_by.capitalize()}}</p>
-                        <p style="font-size:13px"><b>Date Posted</b>: {{new_stories.unix_time_convert}}</p>
+                        <h5>{{new_stories.title}}</h5>
+                        <p style="font-size:13px; color:#fff"><b>Posted By</b>: {{new_stories.posted_by.capitalize()}}</p>
+                        <p style="font-size:13px; color:#fff"><b>Date Posted</b>: {{new_stories.unix_time_convert}}</p>
                         {%if new_stories.decendants > 1%}
-                        <a class='btn btn-info btn-sm' href='/comments/{{new_stories.new_story_id}}'>{{new_stories.decendants}} Comments</a>
+                        <a class='btn btn-secondary btn-sm' href='/comments/{{new_stories.new_story_id}}'>{{new_stories.decendants}} Comments</a>
                         {%else%}
-                        <a class='btn btn-info btn-sm' href='/comments/{{new_stories.new_story_id}}'>{{new_stories.decendants}} Comment</a>
+                        <a class='btn btn-secondary btn-sm' href='/comments/{{new_stories.new_story_id}}'>{{new_stories.decendants}} Comment</a>
                         {%endif%}
-                        <a class='btn btn-outline-success btn-sm float-end' href='{{new_stories.story_url}}'>Read More</a>
+                        <a class='btn btn-warning btn-sm float-end' href='{{new_stories.story_url}}'>Read More</a>
                     </div>
                 {%endfor%}
                 
@@ -85,9 +100,9 @@
                 {%for pagenum in new_news.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
                     {%if pagenum%}
                         {%if new_news.page == pagenum %}
-                        <a href='{{url_for("home", page=pagenum)}}' class='btn btn-success mb-4'>{{pagenum}}</a>
+                        <a href='{{url_for("home", page=pagenum)}}' class='btn btn-warning mb-4'>{{pagenum}}</a>
                         {%else%}
-                        <a href='{{url_for("home", page=pagenum)}}' class='btn btn-outline-success mb-4'>{{pagenum}}</a>
+                        <a href='{{url_for("home", page=pagenum)}}' class='btn btn-outline-warning mb-4'>{{pagenum}}</a>
                         {%endif%}
                     {%else%}
                         ...
@@ -96,13 +111,29 @@
             </div><hr>
             
             {%endblock lateststories%}
+
+            {%block footer%}
+            <div class="row">
+                <div class='col'>
+                    <p class='text-center' style="font-size:12px">2022. All Rights Reserved.</p>
+                    <p class='text-center' style="font-size:12px">Developed by Amaechi</p>
+                </div>
+            </div>
+            {%endblock%}
         </div>
 
         {%autoescape false%}
         <script type="text/javascript" src="{{url_for('static',filename='jquery/jquery.min.js')}}"></script>
         {%block scripts%}
         <script type='text/javascript'>
-           
+            function checkNewNews(){
+
+                if(document.getElementById('search_latest_news').value==""){
+                    alert('Field cannot be empty')
+                    $('#search_latest_news').focus();
+                    return false;
+                }
+            }
         </script>
         {%endblock scripts%}
         <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.bundle.js')}}"></script>

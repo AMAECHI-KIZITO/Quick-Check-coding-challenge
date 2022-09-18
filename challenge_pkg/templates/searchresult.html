@@ -1,0 +1,37 @@
+{% extends 'hackerhome.html' %}
+
+{%block title%}Hacker News - Search Results{%endblock%}
+
+{%block searches%}
+<div></div>
+{%endblock searches%}
+
+
+{%block lateststories%}
+<div class='row mb-3' style='background-color:orange; border-bottom-style: solid'>
+    <div class='col py-3'>
+        <h3 style='color:darkblue;'>Search Results</h3>
+    </div>
+</div>
+
+<div class='row'>
+    <div class='col-12'>
+        {%set Notfound=get_flashed_messages(category_filter='item_not_found')%}
+        {%for x in Notfound%}
+        <div class="alert alert-danger">{{x}}</div>
+        {%endfor%}
+    </div>
+
+
+
+    {%for x in result%}
+        <div class='col-12 pb-2 mt-1'  style='border-bottom-style: dotted'>
+            <h5>{{x.title}}</h5>
+            <p style="font-size:13px; color:#fff"><b>Posted By</b>: {{x.posted_by.capitalize()}}</p>
+            <p style="font-size:13px; color:#fff"><b>Date Posted</b>: {{x.unix_time_convert}}</p>
+            
+            <a class='btn btn-warning btn-sm float-end' href='{{x.story_url}}'>View Job</a>
+        </div>
+    {%endfor%}
+</div>
+{%endblock lateststories%}

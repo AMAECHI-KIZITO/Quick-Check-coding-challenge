@@ -3,10 +3,24 @@
 
 {%block title%}Hacker News - Top Stories{%endblock%}
 
+{%block searches%}
+<div>
+    <form action='/search_top_news/' method='post'>
+        <div>
+            <input type='hidden' name='csrf_token' id='csrf_token' value='{{csrf_token()}}'>
+        </div>
+        <div>
+            <input type='text' name='search_top_news' id="search_top_news" placeholder='Search Top News'/>
+            <button type='submit' class='btn btn-warning btn-sm' id='btnSearchTopnews' onclick='return checkTopNews()'>Search</button>
+        </div>
+    </form>
+</div>
+{%endblock searches%}
+
 
 {%block lateststories%}
 <div class='row mb-3' style='background-color:orange; border-bottom-style: solid'>
-    <div class='col'>
+    <div class='col py-3'>
         <h3 style='color:darkblue;'>Top Stories</h3>
     </div>
 </div>
@@ -14,17 +28,17 @@
 <div class='row'>
     {%for top_stories in top_news.items%}
         <div class='col-12 pb-2 mt-1'  style='border-bottom-style: dotted'>
-            <h6>{{top_stories.title}}</h6>
-            <p style="font-size:13px"><b>Posted By</b>: {{top_stories.posted_by.capitalize()}}</p>
-            <p style="font-size:13px"><b>Date Posted</b>: {{top_stories.unix_time_convert}}</p>
+            <h5>{{top_stories.title}}</h5>
+            <p style="font-size:13px; color:#fff"><b>Posted By</b>: {{top_stories.posted_by.capitalize()}}</p>
+            <p style="font-size:13px; color:#fff"><b>Date Posted</b>: {{top_stories.unix_time_convert}}</p>
             
             {%if top_stories.decendants > 1%}
-            <a class='btn btn-info btn-sm' href='/top-story-comments/{{top_stories.top_story_id}}'>{{top_stories.decendants}} Comments</a>
+            <a class='btn btn-secondary btn-sm' href='/top-story-comments/{{top_stories.top_story_id}}'>{{top_stories.decendants}} Comments</a>
             {%else%}
-            <a class='btn btn-info btn-sm' href='/top-story-comments/{{top_stories.top_story_id}}'>{{top_stories.decendants}} Comment</a>
+            <a class='btn btn-secondary btn-sm' href='/top-story-comments/{{top_stories.top_story_id}}'>{{top_stories.decendants}} Comment</a>
             {%endif%}
 
-            <a class='btn btn-primary btn-sm float-end' href='{{top_stories.story_url}}'>Read More</a>
+            <a class='btn btn-warning btn-sm float-end' href='{{top_stories.story_url}}'>Read More</a>
         </div>
     {%endfor%}
 </div>
@@ -33,9 +47,9 @@
     {%for pagenum in top_news.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
         {%if pagenum%}
             {%if top_news.page == pagenum %}
-            <a href='{{url_for("topstories", page=pagenum)}}' class='btn btn-success mb-4'>{{pagenum}}</a>
+            <a href='{{url_for("topstories", page=pagenum)}}' class='btn btn-warning mb-4'>{{pagenum}}</a>
             {%else%}
-            <a href='{{url_for("topstories", page=pagenum)}}' class='btn btn-outline-success mb-4'>{{pagenum}}</a>
+            <a href='{{url_for("topstories", page=pagenum)}}' class='btn btn-outline-warning mb-4'>{{pagenum}}</a>
             {%endif%}
         {%else%}
             ...
@@ -44,3 +58,18 @@
 </div><hr>
    
 {%endblock lateststories%}
+
+
+
+{%block scripts%}
+    <script type='text/javascript'>
+        function checkTopNews(){
+
+            if(document.getElementById('search_top_news').value==""){
+                alert('Field cannot be empty')
+                $('#search_top_news').focus();
+                return false;
+            }
+        }    
+    </script>
+{%endblock scripts%}
